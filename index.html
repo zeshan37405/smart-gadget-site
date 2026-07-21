@@ -25,12 +25,12 @@
   }
   </script>
 </head>
-<body>
+<body id="top">
   <div class="announcement">
     <div class="container announcement-inner">
-      <span>Fresh finds added regularly</span>
+      <span>Fresh product discoveries added regularly</span>
       <span class="announcement-highlight">Curated for US shoppers</span>
-      <span>Secure shopping on retailer websites</span>
+      <span>Purchases are completed on retailer websites</span>
     </div>
   </div>
 
@@ -47,7 +47,7 @@
       </form>
 
       <div class="header-actions" aria-label="Quick links">
-        <a href="#deals"><span class="action-icon">⚡</span><span><small>Today’s</small>Deals</span></a>
+        <a href="#categories"><span class="action-icon">☷</span><span><small>Browse by</small>Category</span></a>
         <a href="about.html"><span class="action-icon">☺</span><span><small>Learn about</small>Zavo</span></a>
       </div>
     </div>
@@ -56,7 +56,6 @@
       <div class="container market-nav">
         <a class="departments-link" href="#categories"><span>☰</span> All Categories</a>
         <nav aria-label="Main navigation">
-          <a href="#deals">Flash Picks</a>
           <a href="#shop">New Arrivals</a>
           <a href="#categories">Fashion</a>
           <a href="#categories">Home & Living</a>
@@ -86,8 +85,8 @@
             <h1>Big finds.<br>Better everyday.</h1>
             <p>Discover standout fashion, beauty, home, tech, and lifestyle products selected for style, usefulness, and value.</p>
             <div class="hero-actions">
-              <a class="btn btn-light" href="#shop">Shop New Finds</a>
-              <a class="hero-text-link" href="#categories">Explore categories →</a>
+              <a class="btn btn-light" href="#shop">Explore Products</a>
+              <a class="hero-text-link" href="#categories">Browse categories →</a>
             </div>
           </div>
 
@@ -106,60 +105,39 @@
 
         <div class="promo-stack">
           <a class="promo-card promo-card-light" href="#shop" data-category="Beauty">
-            <span class="promo-kicker">Beauty Edit</span>
-            <strong>Everyday glow-up picks</strong>
-            <small>Explore now →</small>
+            <span class="promo-kicker">Beauty</span>
+            <strong>Everyday beauty and self-care finds</strong>
+            <small>Explore products →</small>
           </a>
           <a class="promo-card promo-card-dark" href="#shop" data-category="Gadgets">
-            <span class="promo-kicker">Smart Finds</span>
+            <span class="promo-kicker">Gadgets</span>
             <strong>Useful tech for daily life</strong>
-            <small>Discover more →</small>
+            <small>Explore products →</small>
           </a>
         </div>
       </div>
     </section>
 
-    <section class="service-strip" aria-label="Shopping benefits">
+    <section class="service-strip" aria-label="Shopping information">
       <div class="container service-grid">
-        <div><span>✓</span><strong>Curated Selection</strong><small>Useful, stylish product finds</small></div>
-        <div><span>↗</span><strong>Direct Retailer Access</strong><small>Current pricing and availability</small></div>
+        <div><span>✓</span><strong>Curated Selection</strong><small>Useful and appealing product finds</small></div>
+        <div><span>↗</span><strong>Direct Retailer Access</strong><small>Check current pricing and availability</small></div>
         <div><span>⌕</span><strong>Easy Product Discovery</strong><small>Search and filter in seconds</small></div>
-        <div><span>♡</span><strong>Fresh New Arrivals</strong><small>Catalog updated regularly</small></div>
+        <div><span>♡</span><strong>Independent Website</strong><small>Products are not sold directly by Zavo</small></div>
       </div>
     </section>
 
-    <section id="deals" class="section deals-section">
+    <section id="deals" class="section deals-section" hidden>
       <div class="container">
-        <div class="market-section-head">
+        <div class="market-section-head simple-head">
           <div>
-            <span class="eyebrow">Hot right now</span>
-            <h2>Flash Picks</h2>
-          </div>
-          <div class="deal-timer" aria-label="Deals refresh countdown">
-            <span>Deals refresh in</span>
-            <strong id="dealCountdown">00:00:00</strong>
+            <span class="eyebrow">Verified retailer timing</span>
+            <h2>Limited-time deals</h2>
+            <p>Countdowns appear only when a valid retailer-provided end time is available in the product catalog.</p>
           </div>
           <a href="#shop">See all products →</a>
         </div>
-
-        <div class="flash-grid">
-          <a class="flash-card flash-fashion" href="#shop" data-category="Fashion">
-            <div><span>Fashion</span><strong>Fresh looks for every day</strong><small>Shop the edit →</small></div>
-            <b>01</b>
-          </a>
-          <a class="flash-card flash-home" href="#shop" data-category="Home & Living">
-            <div><span>Home</span><strong>Easy upgrades for your space</strong><small>Explore home →</small></div>
-            <b>02</b>
-          </a>
-          <a class="flash-card flash-beauty" href="#shop" data-category="Beauty">
-            <div><span>Beauty</span><strong>Trending self-care essentials</strong><small>Browse beauty →</small></div>
-            <b>03</b>
-          </a>
-          <a class="flash-card flash-tech" href="#shop" data-category="Gadgets">
-            <div><span>Gadgets</span><strong>Smart solutions that work</strong><small>Find gadgets →</small></div>
-            <b>04</b>
-          </a>
-        </div>
+        <div id="flashGrid" class="flash-grid" aria-live="polite"></div>
       </div>
     </section>
 
@@ -175,11 +153,9 @@
 
         <div class="round-category-grid">
           <a class="round-category" href="#shop" data-category="Fashion"><span>👗</span><strong>Fashion</strong><small>Fresh everyday style</small></a>
-          <a class="round-category" href="#shop" data-category="Home & Living"><span>🛋️</span><strong>Home & Living</strong><small>Make your space better</small></a>
+          <a class="round-category" href="#shop" data-category="Home & Living"><span>🛋️</span><strong>Home & Living</strong><small>Products for modern spaces</small></a>
           <a class="round-category" href="#shop" data-category="Beauty"><span>💄</span><strong>Beauty</strong><small>Self-care and accessories</small></a>
           <a class="round-category" href="#shop" data-category="Gadgets"><span>🎧</span><strong>Gadgets</strong><small>Smart everyday tech</small></a>
-          <a class="round-category" href="#shop"><span>🎁</span><strong>Gift Ideas</strong><small>Interesting finds for anyone</small></a>
-          <a class="round-category" href="#shop"><span>🔥</span><strong>Trending</strong><small>Popular product discoveries</small></a>
         </div>
       </div>
     </section>
@@ -188,8 +164,8 @@
       <div class="container">
         <div class="market-section-head simple-head product-heading">
           <div>
-            <span class="eyebrow">Recommended for you</span>
-            <h2>Today’s top finds</h2>
+            <span class="eyebrow">Curated catalog</span>
+            <h2>Explore current product listings</h2>
             <p><span id="productCount">0</span> products available to explore</p>
           </div>
         </div>
@@ -212,7 +188,7 @@
         </div>
 
         <div class="disclosure-note">
-          <strong>Affiliate disclosure:</strong> Some links on this website are affiliate links. We may earn a commission when you make a purchase through those links, at no extra cost to you. Pricing, availability, shipping, and returns are handled by the linked retailer.
+          <strong>Affiliate disclosure:</strong> Some links on this website are affiliate links. We may earn a commission when you make a purchase through those links, at no extra cost to you. Pricing, availability, shipping, deal timing, and returns are handled by the linked retailer.
         </div>
       </div>
     </section>
@@ -226,7 +202,7 @@
         </div>
         <div class="feature-points">
           <div><span>01</span><strong>Curated, not cluttered</strong><small>Products selected for appeal and everyday value.</small></div>
-          <div><span>02</span><strong>Built for mobile</strong><small>Fast browsing on phones, tablets, and desktops.</small></div>
+          <div><span>02</span><strong>Responsive by design</strong><small>Fast browsing on phones, tablets, and desktops.</small></div>
           <div><span>03</span><strong>Transparent shopping</strong><small>Purchases happen directly on retailer websites.</small></div>
         </div>
       </div>
@@ -258,19 +234,19 @@
           <a class="brand" href="index.html"><span class="brand-mark">Z</span><span>Zavo</span></a>
           <p>Curated fashion, home, beauty, gadgets, and lifestyle finds for everyday living.</p>
         </div>
-        <div><h3 class="footer-title">Explore</h3><div class="footer-links"><a href="#shop">Shop</a><a href="#deals">Flash Picks</a><a href="#categories">Categories</a><a href="about.html">About Us</a></div></div>
+        <div><h3 class="footer-title">Explore</h3><div class="footer-links"><a href="#shop">Products</a><a href="#categories">Categories</a><a href="about.html">About Us</a></div></div>
         <div><h3 class="footer-title">Legal</h3><div class="footer-links"><a href="disclosure.html">Affiliate Disclosure</a><a href="privacy.html">Privacy Policy</a><a href="terms.html">Terms of Use</a></div></div>
         <div><h3 class="footer-title">Popular</h3><div class="footer-links"><a href="#categories">Fashion</a><a href="#categories">Home & Living</a><a href="#categories">Beauty</a><a href="#categories">Gadgets</a></div></div>
       </div>
-      <div class="footer-bottom"><span>© <span id="year"></span> Zavo. All rights reserved.</span><span>Independent product discovery website.</span></div>
+      <div class="footer-bottom"><span>© <span id="year"></span> Zavo. All rights reserved.</span><span>Independent affiliate product discovery website.</span></div>
     </div>
   </footer>
 
   <nav class="mobile-dock" aria-label="Mobile navigation">
     <a href="#top"><span>⌂</span>Home</a>
     <a href="#categories"><span>☷</span>Categories</a>
-    <a class="mobile-dock-main" href="#shop"><span>🛍</span>Shop</a>
-    <a href="#deals"><span>⚡</span>Deals</a>
+    <a class="mobile-dock-main" href="#shop"><span>🛍</span>Products</a>
+    <a href="#shop"><span>⌕</span>Search</a>
     <a href="about.html"><span>☺</span>About</a>
   </nav>
 
