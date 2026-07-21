@@ -8,7 +8,8 @@ const categoryFilter = document.getElementById("categoryFilter");
 const sortFilter = document.getElementById("sortFilter");
 const categoryCards = document.querySelectorAll("[data-category]");
 const productCount = document.getElementById("productCount");
-const dealCountdown = document.getElementById("dealCountdown");
+const dealsSection = document.getElementById("deals");
+const flashGrid = document.getElementById("flashGrid");
 const year = document.getElementById("year");
 
 if (year) year.textContent = new Date().getFullYear();
@@ -72,6 +73,13 @@ function isPublished(value) {
   return !status || ["yes", "true", "1", "publish", "published", "live"].includes(status);
 }
 
+function parseDealEnd(value) {
+  const raw = String(value || "").trim();
+  if (!raw) return null;
+  const timestamp = Date.parse(raw);
+  return Number.isFinite(timestamp) ? timestamp : null;
+}
+
 function buildProducts(rows) {
   if (rows.length < 2) return [];
 
@@ -91,7 +99,8 @@ function buildProducts(rows) {
     keywords: findIndex("keywords", "tags"),
     alt: findIndex("alt text", "image alt"),
     publish: findIndex("publish", "status"),
-    price: findIndex("price", "sale price", "display price")
+    price: findIndex("price", "sale price", "display price"),
+    dealEnd: findIndex("deal end", "deal end time", "flash end", "sale end", "offer end")
   };
 
   return rows.slice(1).map((row, index) => ({
@@ -104,7 +113,8 @@ function buildProducts(rows) {
     keywords: indexes.keywords >= 0 ? row[indexes.keywords] : "",
     alt: indexes.alt >= 0 ? row[indexes.alt] : "",
     publish: indexes.publish >= 0 ? row[indexes.publish] : "",
-    price: indexes.price >= 0 ? row[indexes.price] : ""
+    price: indexes.price >= 0 ? row[indexes.price] : "",
+    dealEnd: indexes.dealEnd >= 0 ? row[indexes.dealEnd] : ""
   })).filter((product) => product.title && isPublished(product.publish));
 }
 
@@ -154,8 +164,8 @@ function renderProducts() {
     const hasProducts = products.length > 0;
     grid.innerHTML = `
       <div class="empty-state">
-        <strong>${hasProducts ? "No products match your search." : "New arrivals are being added."}</strong>
-        ${hasProducts ? "Try a different keyword or category." : "Please check back soon for our latest curated products."}
+        <strong>${hasProducts ? "No products match your search." : "New products are being added."}</strong>
+        ${hasProducts ? "Try a different keyword or category." : "Please check back soon for the latest curated products."}
       </div>`;
     return;
   }
@@ -182,7 +192,7 @@ function renderProducts() {
           <div class="product-confidence">✓ Zavo curated <span>• Retailer listing</span></div>
           <div class="product-meta">
             <span class="product-price">${escapeHTML(price)}</span>
-            <a class="btn btn-primary product-link" href="${escapeHTML(safeLink)}" target="_blank" rel="nofollow sponsored noopener">View Deal</a>
+            <a class="btn btn-primary product-link" href="${escapeHTML(safeLink)}" target="_blank" rel="nofollow sponsored noopener">View Product</a>
           </div>
         </div>
       </article>`;
@@ -213,17 +223,75 @@ function selectCategory(category) {
   renderProducts();
 }
 
-function updateCountdown() {
-  if (!dealCountdown) return;
+function formatRemaining(milliseconds) {
+  const totalSeconds = Math.max(0, Math.floor(milliseconds / 1000));
+  const days = Math.floor(totalSeconds / 86400);
+  const hours = Math.floor((totalSeconds % 86400) / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+  const clock = [hours, minutes, seconds].map((value) => String(value).padStart(2, "0")).join(":");
+  return days > 0 ? `${days}d ${clock}` : clock;
+}
 
-  const now = new Date();
-  const end = new Date(now);
-  end.setHours(23, 59, 59, 999);
-  const remaining = Math.max(0, end.getTime() - now.getTime());
-  const hours = Math.floor(remaining / 3600000);
-  const minutes = Math.floor((remaining % 3600000) / 60000);
-  const seconds = Math.floor((remaining % 60000) / 1000);
-  dealCountdown.textContent = [hours, minutes, seconds].map((value) => String(value).padStart(2, "0")).join(":");
+function getActiveDeals() {
+  const now = Date.now();
+  return products
+    .map((product) => ({ ...product, dealTimestamp: parseDealEnd(product.dealEnd) }))
+    .filter((product) => product.dealTimestamp && product.dealTimestamp > now && /^https?:\/\//i.test(product.link))
+    .sort((a, b) => a.dealTimestamp - b.dealTimestamp)
+    .slice(0, 4);
+}
+
+function getFlashClass(category, index) {
+  const value = normalize(category);
+  if (value.includes("fashion")) return "flash-fashion";
+  if (value.includes("home")) return "flash-home";
+  if (value.includes("beauty")) return "flash-beauty";
+  if (value.includes("gadget") || value.includes("tech")) return "flash-tech";
+  return ["flash-fashion", "flash-home", "flash-beauty", "flash-tech"][index % 4];
+}
+
+function renderDeals() {
+  if (!dealsSection || !flashGrid) return;
+
+  const activeDeals = getActiveDeals();
+  if (!activeDeals.length) {
+    dealsSection.hidden = true;
+    flashGrid.innerHTML = "";
+    return;
+  }
+
+  dealsSection.hidden = false;
+  flashGrid.innerHTML = activeDeals.map((product, index) => {
+    const price = product.price || "Check retailer price";
+    const remaining = formatRemaining(product.dealTimestamp - Date.now());
+
+    return `
+      <a class="flash-card ${getFlashClass(product.category, index)}" href="${escapeHTML(product.link)}" target="_blank" rel="nofollow sponsored noopener">
+        <div>
+          <span>${escapeHTML(product.category || "Limited-time offer")} • Retailer deal</span>
+          <strong>${escapeHTML(product.title)}</strong>
+          <small>${escapeHTML(price)} · Ends in <time data-deal-end="${product.dealTimestamp}">${remaining}</time> →</small>
+        </div>
+      </a>`;
+  }).join("");
+}
+
+function updateDealCountdowns() {
+  if (!dealsSection || dealsSection.hidden) return;
+
+  let expired = false;
+  document.querySelectorAll("[data-deal-end]").forEach((element) => {
+    const end = Number(element.dataset.dealEnd);
+    const remaining = end - Date.now();
+    if (!Number.isFinite(end) || remaining <= 0) {
+      expired = true;
+      return;
+    }
+    element.textContent = formatRemaining(remaining);
+  });
+
+  if (expired) renderDeals();
 }
 
 async function loadProducts() {
@@ -235,8 +303,10 @@ async function loadProducts() {
     products = buildProducts(parseCSV(await response.text()));
     populateCategories();
     renderProducts();
+    renderDeals();
   } catch (error) {
     if (productCount) productCount.textContent = "0";
+    if (dealsSection) dealsSection.hidden = true;
     grid.innerHTML = `
       <div class="empty-state">
         <strong>Our catalog is temporarily unavailable.</strong>
@@ -284,6 +354,5 @@ grid?.addEventListener("click", (event) => {
 const initialQuery = new URLSearchParams(window.location.search).get("q");
 if (searchInput && initialQuery) searchInput.value = initialQuery;
 
-updateCountdown();
-setInterval(updateCountdown, 1000);
+setInterval(updateDealCountdowns, 1000);
 loadProducts();
